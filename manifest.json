@@ -1,0 +1,45 @@
+{
+  "manifest_version": 1,
+  "type": "WebApp",
+  "meta": {
+    "name": "Valorant Roulette",
+    "version": "0.1.0",
+    "author": "Paul",
+    "minimum-overwolf-version": "0.200.0",
+    "description": "Roulette d'achat pour Valorant",
+    "icon": "IconMouseOver.png",
+    "icon_gray": "IconMouseNormal.png",
+    "launcher_icon": "launcher_icon.ico"
+  },
+  "data": {
+    "start_window": "background",
+    "game_targeting": {
+      "type": "dedicated",
+      "game_ids": [21640]
+    },
+    "windows": {
+      "background": {
+        "is_background_page": true,
+        "file": "background.html"
+      },
+      "in_game": {
+        "file": "in_game.html",
+        "transparent": true,
+        "resizable": false,
+        "use_hardware_acceleration": true,
+        "size": {
+          "width": 800,
+          "height": 500
+        },
+        "in_game_only": true
+      }
+    },
+    "hotkeys": {
+      "toggle_in_game": {
+        "title": "Afficher / Masquer la roulette",
+        "action-type": "custom",
+        "default": "Ctrl+Shift+X"
+      }
+    }
+  }
+}

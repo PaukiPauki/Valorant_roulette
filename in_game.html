@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>Valorant Roulette</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      width: 100vw;
+      height: 100vh;
+      background: #0b1219;
+      color: #ece8e1;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border: 2px solid #ff4655;
+    }
+
+    /* HEADER */
+    header {
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #0f1923;
+      border-bottom: 1px solid #1f2b36;
+      font-size: 13px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    select {
+      background: #1a2733;
+      color: #00f5d4;
+      border: 1px solid #2a3d4f;
+      padding: 5px 10px;
+      font-weight: bold;
+      border-radius: 3px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .logo {
+      font-size: 18px;
+      font-weight: 900;
+      color: #ff4655;
+      letter-spacing: 3px;
+    }
+
+    .credits-display {
+      font-size: 16px;
+      font-weight: bold;
+      color: #00f5d4;
+    }
+
+    /* CONTAINER MACHINE */
+    .slots-container {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      padding: 20px;
+      background: #080d12;
+    }
+
+    .slot-column {
+      background: #0f1923;
+      border: 1px solid #1f2b36;
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      box-shadow: inset 0 0 25px rgba(0, 0, 0, 0.8);
+    }
+
+    .slot-header {
+      padding: 10px 0;
+      text-align: center;
+      font-size: 11px;
+      font-weight: bold;
+      letter-spacing: 2px;
+      color: #768088;
+      border-bottom: 1px solid #1b2631;
+      background: rgba(0, 0, 0, 0.25);
+    }
+
+    /* VIEWPORT */
+    .slot-viewport {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Lignes de visée rouge centrale */
+    .slot-viewport::before,
+    .slot-viewport::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: rgba(255, 70, 85, 0.5);
+      z-index: 2;
+    }
+    .slot-viewport::before { top: calc(50% - 65px); }
+    .slot-viewport::after { top: calc(50% + 65px); }
+
+    /* Dégradé haut/bas */
+    .slot-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 3;
+      background: linear-gradient(
+        180deg,
+        rgba(15, 25, 35, 0.95) 0%,
+        rgba(15, 25, 35, 0.05) 30%,
+        rgba(15, 25, 35, 0.05) 70%,
+        rgba(15, 25, 35, 0.95) 100%
+      );
+    }
+
+    .slot-strip {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      will-change: transform;
+    }
+
+    /* CARTES DU ROULEAU (Hauteur 130px) */
+    .slot-card {
+      height: 130px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 14px;
+      box-sizing: border-box;
+    }
+
+    .card-icon-wrap {
+      width: 52px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 8px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .card-icon {
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 8px rgba(0, 245, 212, 0.18));
+    }
+
+    .card-category {
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      color: #768088;
+      margin-bottom: 4px;
+    }
+
+    .card-name {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      text-align: center;
+    }
+
+    .card-cost {
+      font-size: 13px;
+      font-weight: 700;
+      color: #00f5d4;
+      margin-top: 6px;
+    }
+
+    /* STRUCTURE INTERNE ABILITÉS (3 LIGNES) */
+    .ability-stack {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .ability-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 8px;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.03);
+      font-size: 11px;
+    }
+
+    .ability-row.active {
+      border-left: 3px solid #00f5d4;
+      color: #fff;
+    }
+
+    .ability-row.empty {
+      opacity: 0.35;
+      border-left: 3px solid #444;
+      color: #8b978f;
+    }
+
+    .ability-left {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .ability-icon {
+      width: 16px;
+      height: 16px;
+      object-fit: contain;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .ability-key {
+      font-size: 9px;
+      font-weight: 900;
+      background: #1f2b36;
+      color: #ff4655;
+      padding: 1px 4px;
+      border-radius: 2px;
+    }
+
+    .ability-name {
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .ability-cost {
+      font-weight: 700;
+      color: #00f5d4;
+      font-size: 10px;
+    }
+    .ability-row.empty .ability-cost {
+      color: #768088;
+    }
+
+    /* FOOTER */
+    footer {
+      background: #0b1219;
+      border-top: 1px solid #1f2b36;
+      padding: 14px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .controls-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .credit-adjusters {
+      display: flex;
+      gap: 6px;
+    }
+
+    .btn-step {
+      background: #141f29;
+      border: 1px solid #243545;
+      color: #ece8e1;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 2px;
+      transition: background 0.15s;
+    }
+    .btn-step:hover {
+      background: #ff4655;
+      border-color: #ff4655;
+    }
+
+    #roll-btn {
+      background: #ff4655;
+      color: #fff;
+      border: none;
+      padding: 10px 30px;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      cursor: pointer;
+      border-radius: 2px;
+      box-shadow: 0 0 12px rgba(255, 70, 85, 0.4);
+      transition: background 0.15s;
+    }
+    #roll-btn:hover { background: #d43745; }
+    #roll-btn:disabled { background: #444; cursor: not-allowed; box-shadow: none; }
+
+    .stats-row {
+      display: flex;
+      justify-content: space-around;
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      color: #768088;
+      text-transform: uppercase;
+      border-top: 1px solid #141f29;
+      padding-top: 8px;
+    }
+    .stats-row span b {
+      color: #ece8e1;
+      font-size: 13px;
+      margin-left: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-left">
+      <span>Agent :</span>
+      <select id="agent-select"></select>
+    </div>
+    <div class="logo">VALORANT GAMBI</div>
+    <div class="credits-display">
+      CREDITS : <span id="current-credits">4000</span>
+    </div>
+  </header>
+
+  <main class="slots-container">
+    <!-- COLONNE ARME -->
+    <div class="slot-column">
+      <div class="slot-header">WEAPON</div>
+      <div class="slot-viewport" id="viewport-weapon">
+        <div class="slot-overlay"></div>
+        <div class="slot-strip" id="strip-weapon"></div>
+      </div>
+    </div>
+
+    <!-- COLONNE COMPÉTENCES (3 SLOTS) -->
+    <div class="slot-column">
+      <div class="slot-header">ABILITY</div>
+      <div class="slot-viewport" id="viewport-ability">
+        <div class="slot-overlay"></div>
+        <div class="slot-strip" id="strip-ability"></div>
+      </div>
+    </div>
+
+    <!-- COLONNE BOUCLIER -->
+    <div class="slot-column">
+      <div class="slot-header">SHIELD</div>
+      <div class="slot-viewport" id="viewport-shield">
+        <div class="slot-overlay"></div>
+        <div class="slot-strip" id="strip-shield"></div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="controls-row">
+      <div class="credit-adjusters">
+        <button class="btn-step" onclick="adjustCredits(-500)">-500</button>
+        <button class="btn-step" onclick="adjustCredits(-100)">-100</button>
+        <button class="btn-step" onclick="adjustCredits(100)">+100</button>
+        <button class="btn-step" onclick="adjustCredits(500)">+500</button>
+      </div>
+      <button id="roll-btn" onclick="spin()">ESPACE / ROLL</button>
+    </div>
+    <div class="stats-row">
+      <span>Arme : <b id="stat-weapon">0</b></span>
+      <span>Sorts : <b id="stat-abilities">0</b></span>
+      <span>Bouclier : <b id="stat-shield">0</b></span>
+      <span>Total : <b id="stat-spent">0</b></span>
+      <span>Restant : <b id="stat-left">4000</b></span>
+    </div>
+  </footer>
+
+  <script src="in_game.js"></script>
+</body>
+</html>
