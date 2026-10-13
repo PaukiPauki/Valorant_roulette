@@ -103,3 +103,7 @@ Aucune étape de compilation n'est requise. L'application est configurée pour s
 3. Sélectionner un agent, ajuster les crédits si nécessaire, puis lancer avec `Espace`.
 
 L'application cible VALORANT via l'identifiant de jeu Overwolf `21640`.
+
+
+![alt text](image.png)
+![alt text](image-1.png)
