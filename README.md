@@ -2,9 +2,9 @@
 
 # VALORANT ROULETTE
 
-### La roulette d'achat pour vos rounds VALORANT
+### The buy-phase roulette for your VALORANT rounds
 
-Choisissez un agent, ajustez vos crédits et laissez la roulette composer votre équipement : arme, capacités et bouclier.
+Choose an agent, adjust your credits, and let the roulette build your loadout: weapon, abilities, and shield.
 
 ![Overwolf](https://img.shields.io/badge/Overwolf-App-ff4655?style=for-the-badge)
 ![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-f7df1e?style=for-the-badge&logo=javascript&logoColor=111111)
@@ -16,50 +16,50 @@ Choisissez un agent, ajustez vos crédits et laissez la roulette composer votre 
 
 ---
 
-## À propos
+## About
 
-VALORANT ROULETTE est une application Overwolf conçue pour ajouter une part d'aléatoire à la phase d'achat. Elle affiche trois rouleaux synchronisés : **arme**, **capacités de l'agent sélectionné** et **bouclier**. Le total dépensé et les crédits restants sont calculés après chaque tirage.
+VALORANT ROULETTE is an Overwolf app designed to add an element of randomness to the buy phase. It displays three synchronized reels: **weapon**, **the selected agent's abilities**, and **shield**. The total cost and remaining credits are calculated after each spin.
 
-## Fonctionnalités
+## Features
 
-- Tirage aléatoire d'une arme, des capacités et d'un bouclier.
-- Capacités associées aux touches `C`, `Q` et `E` à partir du slot retourné par l'API.
-- Respect des coûts et du nombre de charges configurés localement.
-- Saisie directe du solde avec le clavier ou le pavé numérique (de 0 à 9 000 crédits).
-- Ajustement rapide des crédits par pas de 100 ou 500.
-- Chargement des armes, agents, noms et icônes depuis [valorant-api.com](https://valorant-api.com/).
-- Détection en jeu de l'agent local et de ses crédits via les événements VALORANT d'Overwolf.
-- Synchronisation automatique du menu d'agent et du solde lorsque les données du match sont disponibles.
-- Valeurs intégrées de secours si l'API ou le fichier local d'économie n'est pas accessible.
+- Randomly selects a weapon, abilities, and a shield.
+- Maps abilities to the `C`, `Q`, and `E` keys based on the slots returned by the API.
+- Applies locally configured ability costs and charge limits.
+- Lets you enter your credit balance directly using a keyboard or numpad (from 0 to 9,000 credits).
+- Quickly adjusts credits in increments of 100 or 500.
+- Loads weapons, agents, names, and icons from [valorant-api.com](https://valorant-api.com/).
+- Detects the local agent and credit balance in-game through Overwolf VALORANT events.
+- Automatically synchronizes the agent selector and balance when match data is available.
+- Uses built-in fallback values if the API or local economy file is unavailable.
 
-## Touches et commandes
+## Controls
 
-| Touche / commande | Action |
+| Key / control | Action |
 | --- | --- |
-| `Espace` | Lancer la roulette, si aucun tirage n'est en cours |
-| `Ctrl` + `Maj` + `X` | Afficher ou masquer la fenêtre en jeu Overwolf |
-| Champ `CREDITS` | Affiche le solde détecté en jeu; permet aussi de saisir manuellement un solde entier entre 0 et 9 000, au clavier ou au pavé numérique |
-| Bouton `-500` | Retirer 500 crédits |
-| Bouton `-100` | Retirer 100 crédits |
-| Bouton `+100` | Ajouter 100 crédits |
-| Bouton `+500` | Ajouter 500 crédits |
+| `Space` | Spin the roulette if no spin is already in progress |
+| `Ctrl` + `Shift` + `X` | Show or hide the Overwolf in-game window |
+| `CREDITS` field | Shows the detected in-game balance; also lets you manually enter a whole-number balance from 0 to 9,000 using a keyboard or numpad |
+| `-500` button | Subtract 500 credits |
+| `-100` button | Subtract 100 credits |
+| `+100` button | Add 100 credits |
+| `+500` button | Add 500 credits |
 
-Le raccourci Overwolf peut être modifié depuis les paramètres de raccourcis de l'application.
-Le champ de crédits est désactivé pendant un tirage; le solde utilisé par la roulette reste ainsi fixe jusqu'à la fin de l'animation. Hors match ou lorsque les événements de jeu ne fournissent pas de solde, la saisie manuelle et les boutons restent disponibles.
+The Overwolf hotkey can be changed in the app's hotkey settings.
+The credits field is disabled during a spin so the balance used by the roulette stays fixed until the animation ends. Manual entry and the adjustment buttons remain available outside a match or whenever game events do not provide a balance.
 
-## Sources de données
+## Data sources
 
-L'application interroge les routes publiques suivantes :
+The app makes requests to the following public endpoints:
 
-- `https://valorant-api.com/v1/weapons` pour les armes et leurs icônes.
-- `https://valorant-api.com/v1/gear` pour l'équipement et les boucliers.
-- `https://valorant-api.com/v1/agents?isPlayableCharacter=true` pour les agents, capacités, descriptions et icônes.
+- `https://valorant-api.com/v1/weapons` for weapons and their icons.
+- `https://valorant-api.com/v1/gear` for gear and shields.
+- `https://valorant-api.com/v1/agents?isPlayableCharacter=true` for agents, abilities, descriptions, and icons.
 
-Les événements Overwolf VALORANT sont également utilisés pour détecter l'agent local (`me`) et le montant `money` de l'entrée de tableau des scores marquée `is_local`. Le manifeste déclare le jeu VALORANT (`21640`) et l'application s'abonne aux fonctionnalités `me` et `match_info`.
+Overwolf VALORANT events are also used to detect the local agent (`me`) and the `money` value for the scoreboard entry marked `is_local`. The manifest declares VALORANT (`21640`) as the target game, and the app subscribes to the `me` and `match_info` features.
 
-L'API des agents ne fournit pas les prix d'achat et charges nécessaires à la roulette. Ceux-ci sont complétés localement. Le fichier facultatif `abilities_economy.json`, placé à côté de `in_game.html`, permet de définir ces valeurs par nom d'agent et par slot d'API. Les entrées manquantes utilisent les valeurs intégrées dans `in_game.js`.
+The agents API does not provide the purchase costs and charge counts required by the roulette, so these are supplied locally. The optional `abilities_economy.json` file, placed next to `in_game.html`, lets you define these values by agent name and API slot. Any missing entries use the built-in values in `in_game.js`.
 
-Exemple de structure :
+Example structure:
 
 ```json
 {
@@ -71,39 +71,35 @@ Exemple de structure :
 }
 ```
 
-Les slots API `Ability1`, `Ability2` et `Grenade` désignent les capacités assignées aux touches `Q`, `E` et `C` par défaut. Le champ `key` du JSON permet de configurer la touche affichée dans la roulette.
+The API slots `Ability1`, `Ability2`, and `Grenade` correspond to the abilities assigned to the `Q`, `E`, and `C` keys by default. The JSON `key` field lets you configure which key is displayed in the roulette.
 
 ## Technologies
 
-- **Overwolf Web App** : lancement, fenêtre en jeu et raccourci global.
-- **HTML5** : structure de l'interface.
-- **CSS3** : présentation et animations des rouleaux.
-- **JavaScript (ES6+)** : logique du tirage, calcul des crédits et fusion des données.
-- **Fetch API** : appels HTTP à VALORANT API.
-- **JSON** : données locales d'économie des capacités.
+- **Overwolf Web App**: launch, in-game window, and global hotkey.
+- **HTML5**: interface structure.
+- **CSS3**: styling and reel animations.
+- **JavaScript (ES6+)**: spin logic, credit calculations, and data merging.
+- **Fetch API**: HTTP requests to the VALORANT API.
+- **JSON**: local ability economy data.
 
-Aucune étape de compilation n'est requise. L'application est configurée pour s'exécuter comme une Web App Overwolf.
+No build step is required. The app is configured to run as an Overwolf Web App.
 
-## Fichiers principaux
+## Main files
 
-| Fichier | Rôle |
+| File | Purpose |
 | --- | --- |
-| `manifest.json` | Configuration Overwolf, fenêtres et raccourci global |
-| `background.html` / `background.js` | Fenêtre de fond et logique de démarrage Overwolf |
-| `in_game.html` | Interface de la roulette |
-| `in_game.js` | Appels API, fusion des données et logique de jeu |
-| `abilities_economy.json` | Complément local facultatif : coûts, touches et charges par capacité |
-| `IconMouseNormal.png` / `IconMouseOver.png` | Icônes Overwolf |
-| `launcher_icon.ico` | Icône de lancement |
+| `manifest.json` | Overwolf configuration, windows, and global hotkey |
+| `background.html` / `background.js` | Background window and Overwolf startup logic |
+| `in_game.html` | Roulette interface |
+| `in_game.js` | API requests, data merging, and game logic |
+| `abilities_economy.json` | Optional local settings for ability costs, keys, and charges |
+| `IconMouseNormal.png` / `IconMouseOver.png` | Overwolf icons |
+| `launcher_icon.ico` | Launcher icon |
 
-## Démarrage
+## Getting started
 
-1. Installer ou lancer l'application depuis l'environnement de développement Overwolf.
-2. Démarrer VALORANT et ouvrir la fenêtre de roulette avec `Ctrl` + `Maj` + `X`.
-3. Sélectionner un agent, ajuster les crédits si nécessaire, puis lancer avec `Espace`.
+1. Install or launch the app from the Overwolf development environment.
+2. Start VALORANT and open the roulette window with `Ctrl` + `Shift` + `X`.
+3. Select an agent, adjust your credits if needed, then spin with `Space`.
 
-L'application cible VALORANT via l'identifiant de jeu Overwolf `21640`.
-
-
-![alt text](image.png)
-![alt text](image-1.png)
+The app targets VALORANT using Overwolf game ID `21640`.
