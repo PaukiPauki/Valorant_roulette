@@ -66,6 +66,35 @@
       color: #00f5d4;
     }
 
+    .credits-input {
+      width: 76px;
+      margin-left: 4px;
+      padding: 3px 4px;
+      border: 1px solid #2a3d4f;
+      border-radius: 3px;
+      outline: none;
+      background: #1a2733;
+      color: #00f5d4;
+      font: inherit;
+      text-align: right;
+      user-select: text;
+    }
+
+    .credits-input:focus {
+      border-color: #00f5d4;
+    }
+
+    .credits-input::-webkit-inner-spin-button,
+    .credits-input::-webkit-outer-spin-button {
+      margin: 0;
+      -webkit-appearance: none;
+    }
+
+    .credits-input {
+      appearance: textfield;
+      -moz-appearance: textfield;
+    }
+
     /* CONTAINER MACHINE */
     .slots-container {
       flex: 1;
@@ -158,6 +187,10 @@
       box-sizing: border-box;
     }
 
+    .slot-card.weapon-card {
+      padding: 4px 14px;
+    }
+
     .card-icon-wrap {
       width: 52px;
       height: 52px;
@@ -174,6 +207,18 @@
       height: 44px;
       object-fit: contain;
       filter: drop-shadow(0 0 8px rgba(0, 245, 212, 0.18));
+    }
+
+    .weapon-icon-wrap {
+      width: 76px;
+      height: 76px;
+      flex-shrink: 0;
+      margin-bottom: 4px;
+    }
+
+    .weapon-card-icon {
+      width: 68px;
+      height: 68px;
     }
 
     .card-category {
@@ -196,6 +241,10 @@
       font-weight: 700;
       color: #00f5d4;
       margin-top: 6px;
+    }
+
+    .weapon-card .card-cost {
+      margin-top: 4px;
     }
 
     /* STRUCTURE INTERNE ABILITÉS (3 LIGNES) */
@@ -342,9 +391,9 @@
       <span>Agent :</span>
       <select id="agent-select"></select>
     </div>
-    <div class="logo">VALORANT GAMBI</div>
+    <div class="logo">VALORANT ROULETTE</div>
     <div class="credits-display">
-      CREDITS : <span id="current-credits">4000</span>
+      CREDITS : <input id="current-credits" class="credits-input" type="number" min="0" max="9000" step="1" value="4000" inputmode="numeric" aria-label="Nombre de crédits" />
     </div>
   </header>
 

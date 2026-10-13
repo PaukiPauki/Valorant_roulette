@@ -31,6 +31,7 @@ const DEFAULT_SHIELDS = [
 
 let WEAPONS = [...DEFAULT_WEAPONS];
 let SHIELDS = [...DEFAULT_SHIELDS];
+let ABILITIES_ECONOMY = {};
 
 const DEFAULT_AGENTS = {
   Astra: [
@@ -51,12 +52,12 @@ const DEFAULT_AGENTS = {
   Chamber: [
     { key: 'C', name: 'Trademark', cost: 200, maxPurchases: 1 },
     { key: 'Q', name: 'Head Hunter', cost: 100, maxPurchases: 8 },
-    { key: 'E', name: 'Tour De Force', cost: 0, maxPurchases: 1 }
+    { key: 'E', name: 'Rendez vous', cost: 0, maxPurchases: 1 }
   ],
   Clove: [
     { key: 'C', name: 'Pick-me-up', cost: 100, maxPurchases: 1 },
     { key: 'Q', name: 'Meddle', cost: 250, maxPurchases: 1 },
-    { key: 'E', name: 'Ruse', cost: 100, maxPurchases: 1 }
+    { key: 'E', name: 'Ruse', cost: 150, maxPurchases: 1 }
   ],
   Cypher: [
     { key: 'C', name: 'Trapwire', cost: 200, maxPurchases: 2 },
@@ -64,29 +65,29 @@ const DEFAULT_AGENTS = {
     { key: 'E', name: 'Spycam', cost: 0, maxPurchases: 1 }
   ],
   Deadlock: [
-    { key: 'C', name: 'Sonic Sensor', cost: 200, maxPurchases: 1 },
-    { key: 'Q', name: 'Barrier Mesh', cost: 200, maxPurchases: 1 },
-    { key: 'E', name: 'GravNet', cost: 150, maxPurchases: 1 }
+    { key: 'C', name: 'Sonic Sensor', cost: 200, maxPurchases: 2 },
+    { key: 'Q', name: 'Barrier Mesh', cost: 300, maxPurchases: 1 },
+    { key: 'E', name: 'GravNet', cost: 0, maxPurchases: 1 }
   ],
   Fade: [
     { key: 'C', name: 'Seize', cost: 200, maxPurchases: 1 },
-    { key: 'Q', name: 'Prowler', cost: 250, maxPurchases: 1 },
-    { key: 'E', name: 'Dark Curve', cost: 150, maxPurchases: 1 }
+    { key: 'Q', name: 'Prowler', cost: 250, maxPurchases: 2 },
+    { key: 'E', name: 'Haunt', cost: 150, maxPurchases: 1 }
   ],
   Gekko: [
-    { key: 'C', name: 'Wingman', cost: 250, maxPurchases: 1 },
-    { key: 'Q', name: 'Dizzy', cost: 200, maxPurchases: 1 },
-    { key: 'E', name: 'Mosh Pit', cost: 200, maxPurchases: 1 }
+    { key: 'C', name: 'Wingman', cost: 300, maxPurchases: 1 },
+    { key: 'Q', name: 'Mosh Pit', cost: 250, maxPurchases: 1 },
+    { key: 'E', name: 'Dizzy', cost: 0, maxPurchases: 1 }
   ],
   Harbor: [
-    { key: 'C', name: 'Cascade', cost: 150, maxPurchases: 1 },
+    { key: 'C', name: 'Storm Surge', cost: 200, maxPurchases: 1 },
     { key: 'Q', name: 'High Tide', cost: 300, maxPurchases: 1 },
-    { key: 'E', name: 'Cove', cost: 150, maxPurchases: 1 }
+    { key: 'E', name: 'Cove', cost: 0, maxPurchases: 1 }
   ],
   Iso: [
     { key: 'C', name: 'Undercut', cost: 200, maxPurchases: 1 },
     { key: 'Q', name: 'Contingency', cost: 200, maxPurchases: 1 },
-    { key: 'E', name: 'Bullet Burst', cost: 0, maxPurchases: 1 }
+    { key: 'E', name: 'Double Tap', cost: 0, maxPurchases: 1 }
   ],
   Jett: [
     { key: 'C', name: 'Cloudburst', cost: 200, maxPurchases: 2 },
@@ -94,17 +95,17 @@ const DEFAULT_AGENTS = {
     { key: 'E', name: 'Tailwind', cost: 0, maxPurchases: 1 }
   ],
   'KAY/O': [
-    { key: 'C', name: 'FRAG/ment', cost: 250, maxPurchases: 1 },
-    { key: 'Q', name: 'FLASH/drive', cost: 250, maxPurchases: 1 },
+    { key: 'C', name: 'FRAG/ment', cost: 200, maxPurchases: 1 },
+    { key: 'Q', name: 'FLASH/drive', cost: 250, maxPurchases: 2 },
     { key: 'E', name: 'ZERO/point', cost: 0, maxPurchases: 1 }
   ],
   Killjoy: [
     { key: 'C', name: 'Alarmbot', cost: 200, maxPurchases: 1 },
-    { key: 'Q', name: 'Turret', cost: 150, maxPurchases: 1 },
-    { key: 'E', name: 'Nano Swarm', cost: 0, maxPurchases: 1 }
+    { key: 'Q', name: 'Nano Swarm', cost: 200, maxPurchases: 2 },
+    { key: 'E', name: 'Turret', cost: 0, maxPurchases: 1 }
   ],
   Neon: [
-    { key: 'C', name: 'Fast Lane', cost: 150, maxPurchases: 1 },
+    { key: 'C', name: 'Fast Lane', cost: 300, maxPurchases: 1 },
     { key: 'Q', name: 'Relay Bolt', cost: 200, maxPurchases: 1 },
     { key: 'E', name: 'High Gear', cost: 0, maxPurchases: 1 }
   ],
@@ -115,8 +116,8 @@ const DEFAULT_AGENTS = {
   ],
   Phoenix: [
     { key: 'C', name: 'Blaze', cost: 150, maxPurchases: 1 },
-    { key: 'Q', name: 'Curveball', cost: 250, maxPurchases: 1 },
-    { key: 'E', name: 'Hot Hands', cost: 0, maxPurchases: 1 }
+    { key: 'Q', name: 'Hot Hands', cost: 200, maxPurchases: 1 },
+    { key: 'E', name: 'Curveball', cost: 250, maxPurchases: 1 }
   ],
   Raze: [
     { key: 'C', name: 'Boom Bot', cost: 300, maxPurchases: 1 },
@@ -124,18 +125,17 @@ const DEFAULT_AGENTS = {
     { key: 'E', name: 'Paint Shells', cost: 0, maxPurchases: 1 }
   ],
   Reyna: [
-    { key: 'C', name: 'Leer', cost: 250, maxPurchases: 1 },
-    { key: 'Q', name: 'Devour', cost: 200, maxPurchases: 1 },
-    { key: 'E', name: 'Dismiss', cost: 0, maxPurchases: 1 }
+    { key: 'C', name: 'Leer', cost: 250, maxPurchases: 2 },
+    { key: 'Q', name: 'Devour/Dismiss', cost: 200, maxPurchases: 2 },
   ],
   Sage: [
-    { key: 'C', name: 'Barrier Orb', cost: 400, maxPurchases: 1 },
-    { key: 'Q', name: 'Slow Orb', cost: 200, maxPurchases: 1 },
+    { key: 'C', name: 'Barrier Orb', cost: 300, maxPurchases: 1 },
+    { key: 'Q', name: 'Slow Orb', cost: 200, maxPurchases: 2 },
     { key: 'E', name: 'Healing Orb', cost: 0, maxPurchases: 1 }
   ],
   Skye: [
-    { key: 'C', name: 'Trailblazer', cost: 150, maxPurchases: 1 },
-    { key: 'Q', name: 'Guiding Light', cost: 200, maxPurchases: 1 },
+    { key: 'C', name: 'Trailblazer', cost: 300, maxPurchases: 1 },
+    { key: 'Q', name: 'Guiding Light', cost: 250, maxPurchases: 1 },
     { key: 'E', name: 'Regrowth', cost: 150, maxPurchases: 1 }
   ],
   Sova: [
@@ -145,8 +145,8 @@ const DEFAULT_AGENTS = {
   ],
   Tejo: [
     { key: 'C', name: 'Special Delivery', cost: 200, maxPurchases: 1 },
-    { key: 'Q', name: 'Guided Salvo', cost: 250, maxPurchases: 1 },
-    { key: 'E', name: 'Stealth Drone', cost: 150, maxPurchases: 1 }
+    { key: 'Q', name: 'Guided Salvo', cost: 150, maxPurchases: 1 },
+    { key: 'E', name: 'Stealth Drone', cost: 400, maxPurchases: 1 }
   ],
   Viper: [
     { key: 'C', name: 'Snake Bite', cost: 300, maxPurchases: 1 },
@@ -154,19 +154,24 @@ const DEFAULT_AGENTS = {
     { key: 'E', name: 'Toxic Screen', cost: 0, maxPurchases: 1 }
   ],
   Vyse: [
-    { key: 'C', name: 'Shear', cost: 200, maxPurchases: 1 },
-    { key: 'Q', name: 'Arc Rose', cost: 250, maxPurchases: 1 },
-    { key: 'E', name: 'Steel Garden', cost: 150, maxPurchases: 1 }
+    { key: 'C', name: 'RazorVine', cost: 150, maxPurchases: 2 },
+    { key: 'Q', name: 'Shear', cost: 200, maxPurchases: 1 },
+    { key: 'E', name: 'Arc Rose', cost: 0, maxPurchases: 1 }
   ],
   Waylay: [
-    { key: 'C', name: 'Light Disk', cost: 150, maxPurchases: 1 },
-    { key: 'Q', name: 'Facet', cost: 200, maxPurchases: 1 },
-    { key: 'E', name: 'Convergent Paths', cost: 0, maxPurchases: 1 }
+    { key: 'C', name: 'Saturate', cost: 300, maxPurchases: 1 },
+    { key: 'Q', name: 'LightSpeed', cost: 300, maxPurchases: 1 },
+    { key: 'E', name: 'Refract', cost: 0, maxPurchases: 1 }
   ],
   Yoru: [
-    { key: 'C', name: 'Fakeout', cost: 150, maxPurchases: 1 },
-    { key: 'Q', name: 'Blindside', cost: 200, maxPurchases: 1 },
-    { key: 'E', name: 'Gatecrash', cost: 100, maxPurchases: 1 }
+    { key: 'C', name: 'Fakeout', cost: 200, maxPurchases: 1 },
+    { key: 'Q', name: 'Blindside', cost: 250, maxPurchases: 1 },
+    { key: 'E', name: 'Gatecrash', cost: 150, maxPurchases: 2 }
+  ],
+  Miks: [
+    { key: 'C', name: 'M-Pulse', cost: 250, maxPurchases: 2 },
+    { key: 'Q', name: 'Harmonize', cost: 200, maxPurchases: 1 },
+    { key: 'E', name: 'WaveForm', cost: 150, maxPurchases: 1 }
   ]
 };
 
@@ -176,7 +181,61 @@ let AGENTS = { ...DEFAULT_AGENTS };
 let credits = 4000;
 let currentAgent = 'Raze';
 let isSpinning = false;
+let pendingLiveGameState = null;
+let agentNamesByGameId = {};
 const CARD_HEIGHT = 130; // Hauteur uniforme pour aligner le centre
+
+const VALORANT_AGENT_ALIASES = {
+  Clay: 'Raze',
+  Pandemic: 'Viper',
+  Wraith: 'Omen',
+  Hunter: 'Sova',
+  Thorne: 'Sage',
+  Phoenix: 'Phoenix',
+  Wushu: 'Jett',
+  Gumshoe: 'Cypher',
+  Sarge: 'Brimstone',
+  Breach: 'Breach',
+  Vampire: 'Reyna',
+  Killjoy: 'Killjoy',
+  Guide: 'Skye',
+  Stealth: 'Yoru',
+  Rift: 'Astra',
+  Grenadier: 'KAY/O',
+  Deadeye: 'Chamber',
+  Sprinter: 'Neon',
+  BountyHunter: 'Fade',
+  Mage: 'Harbor',
+  AggroBot: 'Gekko',
+  Cable: 'Deadlock',
+  Sequoia: 'Iso',
+  Smonk: 'Clove'
+};
+
+function applyValorantState(state) {
+  if (isSpinning) {
+    pendingLiveGameState = { ...state };
+    return;
+  }
+
+  if (state.agent) {
+    const agentId = state.agent.replace(/_PC_C$/, '');
+    const agentName = agentNamesByGameId[agentId]
+      || VALORANT_AGENT_ALIASES[agentId]
+      || (AGENTS[state.agent] ? state.agent : null);
+
+    if (agentName && AGENTS[agentName] && agentName !== currentAgent) {
+      currentAgent = agentName;
+      const select = document.getElementById('agent-select');
+      if (select) select.value = agentName;
+      initReel('ability', generateAbilityCombinations(AGENTS[currentAgent])[0]);
+    }
+  }
+
+  if (Number.isFinite(state.credits)) {
+    setCredits(state.credits);
+  }
+}
 
 // --- GÉNÉRATION COMBINATOIRE (0..maxPurchases par capacité) ---
 function generateAbilityCombinations(abilities) {
@@ -289,6 +348,49 @@ async function loadShieldsFromApi() {
   }
 }
 
+async function loadAbilitiesEconomy() {
+  try {
+    const economyUrl = new URL('abilities_economy.json', window.location.href);
+    let contents;
+
+    if (window.overwolf?.io?.readFileContents) {
+      const filePath = decodeURIComponent(economyUrl.pathname)
+        .replace(/^\/([A-Za-z]:)/, '$1')
+        .replace(/\//g, '\\');
+
+      try {
+        contents = await new Promise((resolve, reject) => {
+          window.overwolf.io.readFileContents(
+            filePath,
+            window.overwolf.io.enums.eEncoding.UTF8,
+            result => result.status === 'success'
+              ? resolve(result.content)
+              : reject(new Error(result.error || 'Lecture du fichier impossible'))
+          );
+        });
+      } catch (error) {
+        console.warn('Lecture Overwolf du fichier économie impossible, tentative avec fetch.', error);
+      }
+    }
+
+    if (!contents) {
+      const response = await fetch(economyUrl);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      contents = await response.text();
+    }
+
+    const parsedEconomy = JSON.parse(contents);
+    if (!parsedEconomy || typeof parsedEconomy !== 'object' || Array.isArray(parsedEconomy)) {
+      throw new Error('Format JSON invalide');
+    }
+
+    ABILITIES_ECONOMY = parsedEconomy;
+  } catch (error) {
+    console.warn('Impossible de charger abilities_economy.json, utilisation des valeurs de secours.', error);
+    ABILITIES_ECONOMY = {};
+  }
+}
+
 async function loadAgentsFromApi() {
   try {
     const response = await fetch('https://valorant-api.com/v1/agents?isPlayableCharacter=true');
@@ -297,28 +399,45 @@ async function loadAgentsFromApi() {
     const payload = await response.json();
     const apiAgents = Array.isArray(payload?.data) ? payload.data : [];
     const mappedAgents = {};
+    const mappedAgentNamesByGameId = {};
 
     for (const agent of apiAgents) {
+      if (agent.developerName) {
+        mappedAgentNamesByGameId[agent.developerName] = agent.displayName;
+      }
       const fallback = DEFAULT_AGENTS[agent.displayName] || DEFAULT_AGENTS[agent.displayName.replace(/\s+/g, '')];
-      const abilities = Array.isArray(agent.abilities) ? agent.abilities.slice(0, 3) : [];
+      const keyBySlot = { Grenade: 'C', Ability1: 'Q', Ability2: 'E' };
+      const abilities = Array.isArray(agent.abilities) ? agent.abilities : [];
+      const abilityBySlot = Object.fromEntries(
+        abilities.filter(ability => keyBySlot[ability.slot]).map(ability => [ability.slot, ability])
+      );
+      const economyBySlot = ABILITIES_ECONOMY[agent.displayName] || {};
+      const fallbackByName = fallback
+        ? Object.fromEntries(fallback.map(a => [a.name.trim().toLowerCase(), a]))
+        : {};
       const fallbackByKey = fallback ? Object.fromEntries(fallback.map(a => [a.key, a])) : {};
 
-      mappedAgents[agent.displayName] = ['C', 'Q', 'E'].map((key, index) => {
-        const ability = abilities[index] || {};
-        const fallbackAbility = fallbackByKey[key] || { cost: 0, maxPurchases: 1 };
+      mappedAgents[agent.displayName] = Object.entries(keyBySlot).map(([slot, defaultKey]) => {
+        const ability = abilityBySlot[slot] || {};
+        const apiName = ability.displayName || '';
+        const fallbackAbility = (apiName && fallbackByName[apiName.trim().toLowerCase()])
+          || (!apiName && fallbackByKey[defaultKey])
+          || { cost: 0, maxPurchases: 1 };
+        const economy = economyBySlot[slot] || {};
 
         return {
-          key,
-          name: ability.displayName || fallbackAbility.name || 'Ability',
-          cost: fallbackAbility.cost ?? 0,
-          maxPurchases: fallbackAbility.maxPurchases ?? 1,
+          key: economy.key || defaultKey,
+          name: apiName || fallbackAbility.name || 'Ability',
+          cost: economy.cost ?? fallbackAbility.cost ?? 0,
+          maxPurchases: economy.maxCharges ?? fallbackAbility.maxPurchases ?? 1,
           icon: ability.displayIcon || fallbackAbility.icon || ''
         };
-      });
+      }).sort((first, second) => ['C', 'Q', 'E'].indexOf(first.key) - ['C', 'Q', 'E'].indexOf(second.key));
     }
 
     if (Object.keys(mappedAgents).length > 0) {
       AGENTS = mappedAgents;
+      agentNamesByGameId = mappedAgentNamesByGameId;
     }
   } catch (error) {
     console.warn('Impossible de charger les agents depuis l’API, utilisation du fallback local.', error);
@@ -335,9 +454,7 @@ async function loadAgentsFromApi() {
       select.appendChild(opt);
     });
 
-    if (!AGENTS[currentAgent]) {
-      currentAgent = Object.keys(AGENTS)[0] || 'Raze';
-    }
+    currentAgent = select.value || Object.keys(AGENTS)[0] || 'Raze';
 
     const defaultCombo = generateAbilityCombinations(AGENTS[currentAgent])[0];
     initReel('ability', defaultCombo);
@@ -350,11 +467,11 @@ function createCard(type, data) {
   card.className = 'slot-card';
 
   if (type === 'weapon') {
+    card.classList.add('weapon-card');
     card.innerHTML = `
-      <div class="card-icon-wrap">
-        ${data.icon ? `<img class="card-icon" src="${data.icon}" alt="${data.name}" />` : ''}
+      <div class="card-icon-wrap weapon-icon-wrap">
+        ${data.icon ? `<img class="card-icon weapon-card-icon" src="${data.icon}" alt="${data.name}" />` : ''}
       </div>
-      <div class="card-category">${data.category}</div>
       <div class="card-name">${data.name}</div>
       <div class="card-cost">${data.cost > 0 ? data.cost + ' ¤' : 'GRATUIT'}</div>
     `;
@@ -477,8 +594,21 @@ function getValidCombo() {
 // --- ACTIONS & ÉVÉNEMENTS ---
 function adjustCredits(amount) {
   if (isSpinning) return;
-  credits = Math.max(0, Math.min(9000, credits + amount));
-  document.getElementById('current-credits').textContent = credits;
+  setCredits(credits + amount);
+}
+
+function setCredits(value) {
+  if (isSpinning) return;
+
+  const input = document.getElementById('current-credits');
+  const amount = Number(value);
+  if (String(value).trim() === '' || !Number.isFinite(amount)) {
+    if (input) input.value = credits;
+    return;
+  }
+
+  credits = Math.max(0, Math.min(9000, Math.trunc(amount)));
+  if (input) input.value = credits;
   document.getElementById('stat-left').textContent = credits;
 }
 
@@ -486,6 +616,7 @@ async function spin() {
   if (isSpinning) return;
   isSpinning = true;
   document.getElementById('roll-btn').disabled = true;
+  document.getElementById('current-credits').disabled = true;
 
   const result = getValidCombo();
   const abilityCombos = generateAbilityCombinations(AGENTS[currentAgent]);
@@ -506,6 +637,12 @@ async function spin() {
 
   isSpinning = false;
   document.getElementById('roll-btn').disabled = false;
+  document.getElementById('current-credits').disabled = false;
+  if (pendingLiveGameState) {
+    const latestState = pendingLiveGameState;
+    pendingLiveGameState = null;
+    applyValorantState(latestState);
+  }
 }
 
 // Initialisation
@@ -515,6 +652,10 @@ window.addEventListener('load', async () => {
   await Promise.all([
     loadWeaponsFromApi(),
     loadShieldsFromApi(),
+    loadAbilitiesEconomy(),
+  ]);
+
+  await Promise.all([
     loadAgentsFromApi()
   ]);
 
@@ -527,13 +668,33 @@ window.addEventListener('load', async () => {
   }
 
   const initialCombo = generateAbilityCombinations(AGENTS[currentAgent])[0];
+  const creditsInput = document.getElementById('current-credits');
+  if (creditsInput) {
+    creditsInput.addEventListener('input', () => {
+      if (creditsInput.value === '') return;
+      const amount = Number(creditsInput.value);
+      if (!Number.isFinite(amount)) return;
+      credits = Math.max(0, Math.min(9000, Math.trunc(amount)));
+      document.getElementById('stat-left').textContent = credits;
+    });
+    creditsInput.addEventListener('change', () => setCredits(creditsInput.value));
+    creditsInput.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') creditsInput.blur();
+    });
+  }
+
   initReel('weapon', WEAPONS[0]);
   initReel('ability', initialCombo);
   initReel('shield', SHIELDS[0]);
+
+  const background = window.overwolf?.windows?.getMainWindow?.();
+  if (typeof background?.subscribeToValorantState === 'function') {
+    background.subscribeToValorantState(applyValorantState);
+  }
 });
 
 window.addEventListener('keydown', (e) => {
-  if (e.code === 'Space' && !isSpinning) {
+  if (e.code === 'Space' && !isSpinning && e.target?.id !== 'current-credits') {
     e.preventDefault();
     spin();
   }

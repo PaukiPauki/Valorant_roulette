@@ -13,6 +13,7 @@
   },
   "data": {
     "start_window": "background",
+    "game_events": [21640],
     "game_targeting": {
       "type": "dedicated",
       "game_ids": [21640]
