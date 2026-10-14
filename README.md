@@ -27,6 +27,7 @@ VALORANT ROULETTE is an Overwolf app designed to add an element of randomness to
 - Applies locally configured ability costs and charge limits.
 - Lets you enter your credit balance directly using a keyboard or numpad (from 0 to 9,000 credits).
 - Quickly adjusts credits in increments of 100 or 500.
+- Lets you allow or exclude individual weapons from the roulette and saves those preferences locally.
 - Loads weapons, agents, names, and icons from [valorant-api.com](https://valorant-api.com/).
 - Detects the local agent and credit balance in-game through Overwolf VALORANT events.
 - Automatically synchronizes the agent selector and balance when match data is available.
@@ -43,6 +44,7 @@ VALORANT ROULETTE is an Overwolf app designed to add an element of randomness to
 | `-100` button | Subtract 100 credits |
 | `+100` button | Add 100 credits |
 | `+500` button | Add 500 credits |
+| `ARMES` button | Choose which weapons can appear in the roulette; preferences are saved locally |
 
 The Overwolf hotkey can be changed in the app's hotkey settings.
 The credits field is disabled during a spin so the balance used by the roulette stays fixed until the animation ends. Manual entry and the adjustment buttons remain available outside a match or whenever game events do not provide a balance.

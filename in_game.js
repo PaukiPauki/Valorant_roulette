@@ -32,6 +32,9 @@ const DEFAULT_SHIELDS = [
 let WEAPONS = [...DEFAULT_WEAPONS];
 let SHIELDS = [...DEFAULT_SHIELDS];
 let ABILITIES_ECONOMY = {};
+const WEAPON_PREFERENCES_KEY = 'valorantRoulette.disabledWeapons';
+let DISABLED_WEAPONS = new Set();
+const FULL_BUY_WEAPONS = new Set(['vandal', 'phantom', 'warden', 'operator', 'odin']);
 
 const DEFAULT_AGENTS = {
   Astra: [
@@ -40,7 +43,6 @@ const DEFAULT_AGENTS = {
     { key: 'E', name: 'Gravity Well', cost: 250, maxPurchases: 1 }
   ],
   Breach: [
-    { key: 'C', name: 'Fault Line', cost: 0, maxPurchases: 1 },
     { key: 'Q', name: 'Flashpoint', cost: 250, maxPurchases: 2 },
     { key: 'E', name: 'Aftershock', cost: 200, maxPurchases: 1 }
   ],
@@ -51,8 +53,7 @@ const DEFAULT_AGENTS = {
   ],
   Chamber: [
     { key: 'C', name: 'Trademark', cost: 200, maxPurchases: 1 },
-    { key: 'Q', name: 'Head Hunter', cost: 100, maxPurchases: 8 },
-    { key: 'E', name: 'Rendez vous', cost: 0, maxPurchases: 1 }
+    { key: 'Q', name: 'Head Hunter', cost: 100, maxPurchases: 8 }
   ],
   Clove: [
     { key: 'C', name: 'Pick-me-up', cost: 100, maxPurchases: 1 },
@@ -61,13 +62,11 @@ const DEFAULT_AGENTS = {
   ],
   Cypher: [
     { key: 'C', name: 'Trapwire', cost: 200, maxPurchases: 2 },
-    { key: 'Q', name: 'Cyber Cage', cost: 100, maxPurchases: 2 },
-    { key: 'E', name: 'Spycam', cost: 0, maxPurchases: 1 }
+    { key: 'Q', name: 'Cyber Cage', cost: 100, maxPurchases: 2 }
   ],
   Deadlock: [
     { key: 'C', name: 'Sonic Sensor', cost: 200, maxPurchases: 2 },
-    { key: 'Q', name: 'Barrier Mesh', cost: 300, maxPurchases: 1 },
-    { key: 'E', name: 'GravNet', cost: 0, maxPurchases: 1 }
+    { key: 'Q', name: 'Barrier Mesh', cost: 300, maxPurchases: 1 }
   ],
   Fade: [
     { key: 'C', name: 'Seize', cost: 200, maxPurchases: 1 },
@@ -76,38 +75,31 @@ const DEFAULT_AGENTS = {
   ],
   Gekko: [
     { key: 'C', name: 'Wingman', cost: 300, maxPurchases: 1 },
-    { key: 'Q', name: 'Mosh Pit', cost: 250, maxPurchases: 1 },
-    { key: 'E', name: 'Dizzy', cost: 0, maxPurchases: 1 }
+    { key: 'Q', name: 'Mosh Pit', cost: 250, maxPurchases: 1 }
   ],
   Harbor: [
     { key: 'C', name: 'Storm Surge', cost: 200, maxPurchases: 1 },
-    { key: 'Q', name: 'High Tide', cost: 300, maxPurchases: 1 },
-    { key: 'E', name: 'Cove', cost: 0, maxPurchases: 1 }
+    { key: 'Q', name: 'High Tide', cost: 300, maxPurchases: 1 }
   ],
   Iso: [
     { key: 'C', name: 'Undercut', cost: 200, maxPurchases: 1 },
-    { key: 'Q', name: 'Contingency', cost: 200, maxPurchases: 1 },
-    { key: 'E', name: 'Double Tap', cost: 0, maxPurchases: 1 }
+    { key: 'Q', name: 'Contingency', cost: 200, maxPurchases: 1 }
   ],
   Jett: [
     { key: 'C', name: 'Cloudburst', cost: 200, maxPurchases: 2 },
-    { key: 'Q', name: 'Updraft', cost: 150, maxPurchases: 1 },
-    { key: 'E', name: 'Tailwind', cost: 0, maxPurchases: 1 }
+    { key: 'Q', name: 'Updraft', cost: 150, maxPurchases: 1 }
   ],
   'KAY/O': [
     { key: 'C', name: 'FRAG/ment', cost: 200, maxPurchases: 1 },
-    { key: 'Q', name: 'FLASH/drive', cost: 250, maxPurchases: 2 },
-    { key: 'E', name: 'ZERO/point', cost: 0, maxPurchases: 1 }
+    { key: 'Q', name: 'FLASH/drive', cost: 250, maxPurchases: 2 }
   ],
   Killjoy: [
     { key: 'C', name: 'Alarmbot', cost: 200, maxPurchases: 1 },
-    { key: 'Q', name: 'Nano Swarm', cost: 200, maxPurchases: 2 },
-    { key: 'E', name: 'Turret', cost: 0, maxPurchases: 1 }
+    { key: 'Q', name: 'Nano Swarm', cost: 200, maxPurchases: 2 }
   ],
   Neon: [
     { key: 'C', name: 'Fast Lane', cost: 300, maxPurchases: 1 },
-    { key: 'Q', name: 'Relay Bolt', cost: 200, maxPurchases: 1 },
-    { key: 'E', name: 'High Gear', cost: 0, maxPurchases: 1 }
+    { key: 'Q', name: 'Relay Bolt', cost: 200, maxPurchases: 1 }
   ],
   Omen: [
     { key: 'C', name: 'Shrouded Step', cost: 100, maxPurchases: 2 },
@@ -121,8 +113,7 @@ const DEFAULT_AGENTS = {
   ],
   Raze: [
     { key: 'C', name: 'Boom Bot', cost: 300, maxPurchases: 1 },
-    { key: 'Q', name: 'Blast Pack', cost: 200, maxPurchases: 1 },
-    { key: 'E', name: 'Paint Shells', cost: 0, maxPurchases: 1 }
+    { key: 'Q', name: 'Blast Pack', cost: 200, maxPurchases: 1 }
   ],
   Reyna: [
     { key: 'C', name: 'Leer', cost: 250, maxPurchases: 2 },
@@ -130,8 +121,7 @@ const DEFAULT_AGENTS = {
   ],
   Sage: [
     { key: 'C', name: 'Barrier Orb', cost: 300, maxPurchases: 1 },
-    { key: 'Q', name: 'Slow Orb', cost: 200, maxPurchases: 2 },
-    { key: 'E', name: 'Healing Orb', cost: 0, maxPurchases: 1 }
+    { key: 'Q', name: 'Slow Orb', cost: 200, maxPurchases: 2 }
   ],
   Skye: [
     { key: 'C', name: 'Trailblazer', cost: 300, maxPurchases: 1 },
@@ -140,8 +130,7 @@ const DEFAULT_AGENTS = {
   ],
   Sova: [
     { key: 'C', name: 'Owl Drone', cost: 400, maxPurchases: 1 },
-    { key: 'Q', name: 'Shock Bolt', cost: 150, maxPurchases: 2 },
-    { key: 'E', name: 'Recon Bolt', cost: 0, maxPurchases: 1 }
+    { key: 'Q', name: 'Shock Bolt', cost: 150, maxPurchases: 2 }
   ],
   Tejo: [
     { key: 'C', name: 'Special Delivery', cost: 200, maxPurchases: 1 },
@@ -150,18 +139,15 @@ const DEFAULT_AGENTS = {
   ],
   Viper: [
     { key: 'C', name: 'Snake Bite', cost: 300, maxPurchases: 1 },
-    { key: 'Q', name: 'Poison Cloud', cost: 200, maxPurchases: 1 },
-    { key: 'E', name: 'Toxic Screen', cost: 0, maxPurchases: 1 }
+    { key: 'Q', name: 'Poison Cloud', cost: 200, maxPurchases: 1 }
   ],
   Vyse: [
     { key: 'C', name: 'RazorVine', cost: 150, maxPurchases: 2 },
-    { key: 'Q', name: 'Shear', cost: 200, maxPurchases: 1 },
-    { key: 'E', name: 'Arc Rose', cost: 0, maxPurchases: 1 }
+    { key: 'Q', name: 'Shear', cost: 200, maxPurchases: 1 }
   ],
   Waylay: [
     { key: 'C', name: 'Saturate', cost: 300, maxPurchases: 1 },
-    { key: 'Q', name: 'LightSpeed', cost: 300, maxPurchases: 1 },
-    { key: 'E', name: 'Refract', cost: 0, maxPurchases: 1 }
+    { key: 'Q', name: 'LightSpeed', cost: 300, maxPurchases: 1 }
   ],
   Yoru: [
     { key: 'C', name: 'Fakeout', cost: 200, maxPurchases: 1 },
@@ -253,14 +239,16 @@ function generateAbilityCombinations(abilities) {
 
     const ability = abilities[index];
     const maxQty = ability.maxPurchases ?? 1;
+    const minQty = Number(ability.cost) === 0 && maxQty === 1 ? 1 : 0;
 
-    for (let quantity = 0; quantity <= maxQty; quantity++) {
+    for (let quantity = minQty; quantity <= maxQty; quantity++) {
       const nextSlot = quantity > 0
         ? {
             key: ability.key,
             name: ability.name,
             cost: ability.cost,
             quantity,
+            maxPurchases: maxQty,
             icon: ability.icon || '',
             isPurchased: true
           }
@@ -269,6 +257,7 @@ function generateAbilityCombinations(abilities) {
             name: 'NOTHING',
             cost: 0,
             quantity: 0,
+            maxPurchases: maxQty,
             icon: '',
             isPurchased: false
           };
@@ -313,6 +302,102 @@ async function loadWeaponsFromApi() {
     console.warn('Impossible de charger les armes depuis l’API, utilisation du fallback local.', error);
     WEAPONS = [...DEFAULT_WEAPONS];
   }
+}
+
+function loadWeaponPreferences() {
+  try {
+    const storedPreferences = JSON.parse(window.localStorage.getItem(WEAPON_PREFERENCES_KEY) || '[]');
+    DISABLED_WEAPONS = new Set(Array.isArray(storedPreferences) ? storedPreferences : []);
+  } catch (error) {
+    console.warn('Impossible de charger les préférences d’armes.', error);
+    DISABLED_WEAPONS = new Set();
+  }
+}
+
+function saveWeaponPreferences() {
+  try {
+    window.localStorage.setItem(WEAPON_PREFERENCES_KEY, JSON.stringify([...DISABLED_WEAPONS]));
+  } catch (error) {
+    console.warn('Impossible de sauvegarder les préférences d’armes.', error);
+  }
+}
+
+function getAvailableWeapons() {
+  return WEAPONS.filter(weapon => !DISABLED_WEAPONS.has(weapon.name));
+}
+
+function getWeaponsWithPreferences() {
+  return WEAPONS.filter(weapon => weapon.name.trim().toLowerCase() !== 'classic'
+    && !/melee/i.test(`${weapon.name} ${weapon.category || ''}`));
+}
+
+function updateWeaponPreferenceSummary() {
+  const summary = document.getElementById('weapon-preference-count');
+  const status = document.getElementById('weapon-preference-status');
+  const preferenceWeapons = getWeaponsWithPreferences();
+  const enabledCount = preferenceWeapons.filter(weapon => !DISABLED_WEAPONS.has(weapon.name)).length;
+  if (summary) summary.textContent = `${enabledCount}/${preferenceWeapons.length}`;
+  if (status) status.textContent = `${enabledCount} arme(s) autorisée(s)`;
+}
+
+function renderWeaponPreferences() {
+  const list = document.getElementById('weapon-preferences-list');
+  if (!list) return;
+
+  const preferenceWeapons = getWeaponsWithPreferences();
+  let preferencesChanged = false;
+  for (const weapon of WEAPONS) {
+    if (!preferenceWeapons.includes(weapon) && DISABLED_WEAPONS.delete(weapon.name)) {
+      preferencesChanged = true;
+    }
+  }
+  if (preferencesChanged) saveWeaponPreferences();
+
+  if (preferenceWeapons.length > 0 && !preferenceWeapons.some(weapon => !DISABLED_WEAPONS.has(weapon.name))) {
+    for (const weapon of preferenceWeapons) DISABLED_WEAPONS.delete(weapon.name);
+    saveWeaponPreferences();
+  }
+
+  list.replaceChildren();
+  for (const weapon of preferenceWeapons) {
+    const label = document.createElement('label');
+    label.className = 'weapon-preference';
+
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.checked = !DISABLED_WEAPONS.has(weapon.name);
+    checkbox.addEventListener('change', () => {
+      if (!checkbox.checked && getAvailableWeapons().length <= 1) {
+        checkbox.checked = true;
+        const status = document.getElementById('weapon-preference-status');
+        if (status) status.textContent = 'Garde au moins une arme autorisée.';
+        return;
+      }
+
+      if (checkbox.checked) DISABLED_WEAPONS.delete(weapon.name);
+      else DISABLED_WEAPONS.add(weapon.name);
+      saveWeaponPreferences();
+      updateWeaponPreferenceSummary();
+    });
+
+    const details = document.createElement('span');
+    details.className = 'weapon-preference-details';
+    const name = document.createElement('span');
+    name.textContent = weapon.name;
+    const cost = document.createElement('small');
+    cost.textContent = `${weapon.cost} ¤`;
+    details.append(name, cost);
+    label.append(checkbox, details);
+    list.appendChild(label);
+  }
+
+  updateWeaponPreferenceSummary();
+}
+
+function allowAllWeapons() {
+  DISABLED_WEAPONS.clear();
+  saveWeaponPreferences();
+  renderWeaponPreferences();
 }
 
 async function loadShieldsFromApi() {
@@ -561,9 +646,10 @@ function animateReel(columnType, itemsList, winningItem, durationMs) {
 // --- ALGORITHME DE TIRAGE SOUS CONTRAINTE ---
 function getValidCombo() {
   const abilityCombos = generateAbilityCombinations(AGENTS[currentAgent]);
+  const availableWeapons = getAvailableWeapons();
   const validCombos = [];
 
-  for (const weapon of WEAPONS) {
+  for (const weapon of availableWeapons) {
     for (const abilityCombo of abilityCombos) {
       for (const shield of SHIELDS) {
         const total = weapon.cost + abilityCombo.totalCost + shield.cost;
@@ -581,7 +667,7 @@ function getValidCombo() {
 
   if (validCombos.length === 0) {
     return {
-      weapon: WEAPONS[0], // Classic
+      weapon: availableWeapons[0],
       abilityCombo: abilityCombos[0], // 3x NOTHING
       shield: SHIELDS[0], // Nothing
       total: 0
@@ -612,17 +698,70 @@ function setCredits(value) {
   document.getElementById('stat-left').textContent = credits;
 }
 
+function isFullBuy(result) {
+  const weaponName = result.weapon?.name?.trim().toLowerCase();
+  const shieldName = result.shield?.name?.trim().toLowerCase() || '';
+  const abilities = result.abilityCombo?.slots || [];
+  const hasAllUtilities = abilities.length > 0 && abilities.every(
+    ability => ability.maxPurchases > 0 && ability.quantity >= ability.maxPurchases
+  );
+
+  return FULL_BUY_WEAPONS.has(weaponName) && /heavy|lourd/.test(shieldName) && hasAllUtilities;
+}
+
+let victoryTimeout;
+
+function celebrateFullBuy() {
+  const overlay = document.getElementById('victory-overlay');
+  const confetti = document.getElementById('confetti-container');
+  if (!overlay || !confetti) return;
+
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  confetti.replaceChildren();
+  if (!reducedMotion) {
+    const colors = ['#ff4655', '#00f5d4', '#f7df1e', '#ffffff'];
+    for (let index = 0; index < 220; index++) {
+      const piece = document.createElement('span');
+      piece.className = 'confetti-piece';
+      piece.classList.add(['is-square', 'is-ribbon', 'is-spark'][index % 3]);
+      piece.style.left = `${Math.random() * 100}%`;
+      piece.style.setProperty('--confetti-color', colors[Math.floor(Math.random() * colors.length)]);
+      piece.style.setProperty('--confetti-duration', `${2.8 + Math.random() * 1.5}s`);
+      piece.style.setProperty('--confetti-delay', `${Math.random() * 0.8}s`);
+      piece.style.setProperty('--confetti-drift', `${Math.round((Math.random() - 0.5) * 320)}px`);
+      piece.style.setProperty('--confetti-rotation', `${Math.round(Math.random() * 1440)}deg`);
+      confetti.appendChild(piece);
+    }
+  }
+
+  clearTimeout(victoryTimeout);
+  document.body.classList.remove('is-fullbuy');
+  overlay.classList.remove('is-active');
+  void overlay.offsetWidth;
+  overlay.classList.add('is-active');
+  if (!reducedMotion) {
+    void document.body.offsetWidth;
+    document.body.classList.add('is-fullbuy');
+  }
+  victoryTimeout = setTimeout(() => {
+    overlay.classList.remove('is-active');
+    confetti.replaceChildren();
+    document.body.classList.remove('is-fullbuy');
+  }, 4400);
+}
+
 async function spin() {
   if (isSpinning) return;
   isSpinning = true;
   document.getElementById('roll-btn').disabled = true;
   document.getElementById('current-credits').disabled = true;
+  document.getElementById('weapon-preferences-open').disabled = true;
 
   const result = getValidCombo();
   const abilityCombos = generateAbilityCombinations(AGENTS[currentAgent]);
 
   // Déroulement des trois colonnes
-  const rollWeapon = animateReel('weapon', WEAPONS, result.weapon, 1800);
+  const rollWeapon = animateReel('weapon', getAvailableWeapons(), result.weapon, 1800);
   const rollAbility = animateReel('ability', abilityCombos, result.abilityCombo, 2300);
   const rollShield = animateReel('shield', SHIELDS, result.shield, 2800);
 
@@ -634,10 +773,12 @@ async function spin() {
   document.getElementById('stat-shield').textContent = `${result.shield.cost} ¤`;
   document.getElementById('stat-spent').textContent = `${result.total} ¤`;
   document.getElementById('stat-left').textContent = `${credits - result.total} ¤`;
+  if (isFullBuy(result)) celebrateFullBuy();
 
   isSpinning = false;
   document.getElementById('roll-btn').disabled = false;
   document.getElementById('current-credits').disabled = false;
+  document.getElementById('weapon-preferences-open').disabled = false;
   if (pendingLiveGameState) {
     const latestState = pendingLiveGameState;
     pendingLiveGameState = null;
@@ -648,6 +789,7 @@ async function spin() {
 // Initialisation
 window.addEventListener('load', async () => {
   const select = document.getElementById('agent-select');
+  loadWeaponPreferences();
 
   await Promise.all([
     loadWeaponsFromApi(),
@@ -658,6 +800,28 @@ window.addEventListener('load', async () => {
   await Promise.all([
     loadAgentsFromApi()
   ]);
+
+  renderWeaponPreferences();
+
+  const preferencesOverlay = document.getElementById('weapon-preferences');
+  const preferencesButton = document.getElementById('weapon-preferences-open');
+  const closePreferences = () => {
+    preferencesOverlay.hidden = true;
+    preferencesButton.setAttribute('aria-expanded', 'false');
+    preferencesButton.focus();
+  };
+
+  preferencesButton.addEventListener('click', () => {
+    renderWeaponPreferences();
+    preferencesOverlay.hidden = false;
+    preferencesButton.setAttribute('aria-expanded', 'true');
+    preferencesOverlay.querySelector('input')?.focus();
+  });
+  document.getElementById('weapon-preferences-close').addEventListener('click', closePreferences);
+  document.getElementById('weapon-preferences-reset').addEventListener('click', allowAllWeapons);
+  preferencesOverlay.addEventListener('click', event => {
+    if (event.target === preferencesOverlay) closePreferences();
+  });
 
   if (select) {
     select.addEventListener('change', (e) => {
@@ -694,7 +858,14 @@ window.addEventListener('load', async () => {
 });
 
 window.addEventListener('keydown', (e) => {
-  if (e.code === 'Space' && !isSpinning && e.target?.id !== 'current-credits') {
+  const preferencesOverlay = document.getElementById('weapon-preferences');
+  if (e.key === 'Escape' && preferencesOverlay && !preferencesOverlay.hidden) {
+    document.getElementById('weapon-preferences-close').click();
+    return;
+  }
+
+  if (e.code === 'Space' && !isSpinning && e.target?.id !== 'current-credits'
+    && !e.target?.closest?.('#weapon-preferences')) {
     e.preventDefault();
     spin();
   }
