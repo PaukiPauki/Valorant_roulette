@@ -49,7 +49,7 @@ const DEFAULT_AGENTS = {
   Brimstone: [
     { key: 'C', name: 'Stim Beacon', cost: 200, maxPurchases: 1 },
     { key: 'Q', name: 'Incendiary', cost: 250, maxPurchases: 1 },
-    { key: 'E', name: 'Sky Smoke', cost: 100, maxPurchases: 2 }
+    { key: 'E', name: 'Sky Smoke', cost: 100, freeCharges: 1, maxPurchases: 2 }
   ],
   Chamber: [
     { key: 'C', name: 'Trademark', cost: 200, maxPurchases: 1 },
@@ -71,11 +71,12 @@ const DEFAULT_AGENTS = {
   Fade: [
     { key: 'C', name: 'Seize', cost: 200, maxPurchases: 1 },
     { key: 'Q', name: 'Prowler', cost: 250, maxPurchases: 2 },
-    { key: 'E', name: 'Haunt', cost: 150, maxPurchases: 1 }
+    { key: 'E', name: 'Haunt', cost: 0, freeCharges: 1, maxPurchases: 0 }
   ],
   Gekko: [
     { key: 'C', name: 'Wingman', cost: 300, maxPurchases: 1 },
-    { key: 'Q', name: 'Mosh Pit', cost: 250, maxPurchases: 1 }
+    { key: 'Q', name: 'Mosh Pit', cost: 250, maxPurchases: 1 },
+    { key: 'E', name: 'Dizzy', cost: 0, freeCharges: 1, maxPurchases: 0 }
   ],
   Harbor: [
     { key: 'C', name: 'Storm Surge', cost: 200, maxPurchases: 1 },
@@ -104,12 +105,12 @@ const DEFAULT_AGENTS = {
   Omen: [
     { key: 'C', name: 'Shrouded Step', cost: 100, maxPurchases: 2 },
     { key: 'Q', name: 'Paranoia', cost: 250, maxPurchases: 1 },
-    { key: 'E', name: 'Dark Cover', cost: 150, maxPurchases: 1 }
+    { key: 'E', name: 'Dark Cover', cost: 150, freeCharges: 1, maxPurchases: 1 }
   ],
   Phoenix: [
     { key: 'C', name: 'Blaze', cost: 150, maxPurchases: 1 },
     { key: 'Q', name: 'Hot Hands', cost: 200, maxPurchases: 1 },
-    { key: 'E', name: 'Curveball', cost: 250, maxPurchases: 1 }
+    { key: 'E', name: 'Curveball', cost: 250, freeCharges: 1, maxPurchases: 1 }
   ],
   Raze: [
     { key: 'C', name: 'Boom Bot', cost: 300, maxPurchases: 1 },
@@ -130,7 +131,8 @@ const DEFAULT_AGENTS = {
   ],
   Sova: [
     { key: 'C', name: 'Owl Drone', cost: 400, maxPurchases: 1 },
-    { key: 'Q', name: 'Shock Bolt', cost: 150, maxPurchases: 2 }
+    { key: 'Q', name: 'Shock Bolt', cost: 150, maxPurchases: 2 },
+    { key: 'E', name: 'Recon Bolt', cost: 0, freeCharges: 1, maxPurchases: 0 }
   ],
   Tejo: [
     { key: 'C', name: 'Special Delivery', cost: 200, maxPurchases: 1 },
@@ -161,7 +163,27 @@ const DEFAULT_AGENTS = {
   ]
 };
 
-let AGENTS = { ...DEFAULT_AGENTS };
+const NORMALIZED_DEFAULT_AGENTS = Object.fromEntries(
+  Object.entries(DEFAULT_AGENTS).map(([agentName, abilities]) => [
+    agentName,
+    abilities.map(ability => {
+      const hasExplicitFreeCharges = ability.freeCharges !== undefined;
+      const freeCharges = hasExplicitFreeCharges
+        ? ability.freeCharges
+        : Number(ability.cost) === 0 ? (ability.maxPurchases ?? 1) : 0;
+
+      return {
+        ...ability,
+        freeCharges,
+        maxPurchases: hasExplicitFreeCharges
+          ? (ability.maxPurchases ?? 0)
+          : Number(ability.cost) === 0 ? 0 : (ability.maxPurchases ?? 1)
+      };
+    })
+  ])
+);
+
+let AGENTS = { ...NORMALIZED_DEFAULT_AGENTS };
 
 // --- ÉTAT GLOBAL ---
 let credits = 4000;
@@ -223,7 +245,7 @@ function applyValorantState(state) {
   }
 }
 
-// --- GÉNÉRATION COMBINATOIRE (0..maxPurchases par capacité) ---
+// --- GÉNÉRATION COMBINATOIRE (charges gratuites + achats optionnels) ---
 function generateAbilityCombinations(abilities) {
   const combinations = [];
 
@@ -232,23 +254,32 @@ function generateAbilityCombinations(abilities) {
       combinations.push({
         slots,
         totalCost,
-        countPurchased: slots.reduce((sum, slot) => sum + (slot.isPurchased ? slot.quantity : 0), 0)
+        countPurchased: slots.reduce((sum, slot) => sum + slot.purchasedQuantity, 0)
       });
       return;
     }
 
     const ability = abilities[index];
-    const maxQty = ability.maxPurchases ?? 1;
-    const minQty = Number(ability.cost) === 0 && maxQty === 1 ? 1 : 0;
+    const cost = Number(ability.cost) || 0;
+    const hasExplicitFreeCharges = ability.freeCharges !== undefined;
+    const freeCharges = hasExplicitFreeCharges
+      ? ability.freeCharges
+      : cost === 0 ? (ability.maxPurchases ?? 1) : 0;
+    const maxPurchases = hasExplicitFreeCharges
+      ? (ability.maxPurchases ?? 0)
+      : cost === 0 ? 0 : (ability.maxPurchases ?? 1);
 
-    for (let quantity = minQty; quantity <= maxQty; quantity++) {
+    for (let purchasedQuantity = 0; purchasedQuantity <= maxPurchases; purchasedQuantity++) {
+      const quantity = freeCharges + purchasedQuantity;
       const nextSlot = quantity > 0
         ? {
             key: ability.key,
             name: ability.name,
-            cost: ability.cost,
+            cost,
             quantity,
-            maxPurchases: maxQty,
+            freeCharges,
+            purchasedQuantity,
+            maxPurchases,
             icon: ability.icon || '',
             isPurchased: true
           }
@@ -257,17 +288,37 @@ function generateAbilityCombinations(abilities) {
             name: 'NOTHING',
             cost: 0,
             quantity: 0,
-            maxPurchases: maxQty,
+            freeCharges: 0,
+            purchasedQuantity: 0,
+            maxPurchases,
             icon: '',
             isPurchased: false
           };
 
-      build(index + 1, [...slots, nextSlot], totalCost + quantity * ability.cost);
+          build(index + 1, [...slots, nextSlot], totalCost + purchasedQuantity * cost);
     }
   }
 
   build(0, [], 0);
   return combinations;
+}
+
+function resolveAbilityEconomy(economy = {}, fallbackAbility = {}) {
+  const cost = economy.cost ?? fallbackAbility.cost ?? 0;
+  const freeCharges = economy.freeCharges
+    ?? fallbackAbility.freeCharges
+    ?? (Number(cost) === 0 ? fallbackAbility.maxPurchases ?? 1 : 0);
+  const legacyMaxCharges = Number(economy.maxCharges);
+  const maxPurchases = economy.maxPurchases
+    ?? (economy.maxCharges !== undefined && Number.isFinite(legacyMaxCharges)
+      ? Math.max(0, legacyMaxCharges - freeCharges)
+      : fallbackAbility.freeCharges !== undefined
+        ? fallbackAbility.maxPurchases ?? 0
+        : Number(cost) === 0
+          ? 0
+          : fallbackAbility.maxPurchases ?? 1);
+
+  return { cost, freeCharges, maxPurchases };
 }
 
 async function loadWeaponsFromApi() {
@@ -490,7 +541,8 @@ async function loadAgentsFromApi() {
       if (agent.developerName) {
         mappedAgentNamesByGameId[agent.developerName] = agent.displayName;
       }
-      const fallback = DEFAULT_AGENTS[agent.displayName] || DEFAULT_AGENTS[agent.displayName.replace(/\s+/g, '')];
+      const fallback = NORMALIZED_DEFAULT_AGENTS[agent.displayName]
+        || NORMALIZED_DEFAULT_AGENTS[agent.displayName.replace(/\s+/g, '')];
       const keyBySlot = { Grenade: 'C', Ability1: 'Q', Ability2: 'E' };
       const abilities = Array.isArray(agent.abilities) ? agent.abilities : [];
       const abilityBySlot = Object.fromEntries(
@@ -509,12 +561,12 @@ async function loadAgentsFromApi() {
           || (!apiName && fallbackByKey[defaultKey])
           || { cost: 0, maxPurchases: 1 };
         const economy = economyBySlot[slot] || {};
+        const resolvedEconomy = resolveAbilityEconomy(economy, fallbackAbility);
 
         return {
           key: economy.key || defaultKey,
           name: apiName || fallbackAbility.name || 'Ability',
-          cost: economy.cost ?? fallbackAbility.cost ?? 0,
-          maxPurchases: economy.maxCharges ?? fallbackAbility.maxPurchases ?? 1,
+          ...resolvedEconomy,
           icon: ability.displayIcon || fallbackAbility.icon || ''
         };
       }).sort((first, second) => ['C', 'Q', 'E'].indexOf(first.key) - ['C', 'Q', 'E'].indexOf(second.key));
@@ -526,7 +578,7 @@ async function loadAgentsFromApi() {
     }
   } catch (error) {
     console.warn('Impossible de charger les agents depuis l’API, utilisation du fallback local.', error);
-    AGENTS = { ...DEFAULT_AGENTS };
+    AGENTS = { ...NORMALIZED_DEFAULT_AGENTS };
   }
 
   const select = document.getElementById('agent-select');
@@ -562,18 +614,23 @@ function createCard(type, data) {
     `;
   } else if (type === 'ability') {
     const rowsHtml = data.slots.map(s => {
-      const totalCost = s.isPurchased ? s.cost * s.quantity : 0;
-      const label = s.isPurchased ? `${s.name}${s.quantity > 1 ? ` x${s.quantity}` : ''}` : s.name;
+      const totalCost = s.cost * s.purchasedQuantity;
+      const label = s.quantity > 0 ? `${s.name}${s.quantity > 1 ? ` x${s.quantity}` : ''}` : s.name;
       const iconMarkup = s.icon ? `<img class="ability-icon" src="${s.icon}" alt="${label}" />` : '';
+      const costLabel = s.quantity === 0
+        ? 'NO PURCHASE'
+        : s.purchasedQuantity === 0 || totalCost === 0
+          ? 'FREE'
+          : `${totalCost} ¤`;
 
       return `
-        <div class="ability-row ${s.isPurchased ? 'active' : 'empty'}">
+        <div class="ability-row ${s.quantity > 0 ? 'active' : 'empty'}">
           <div class="ability-left">
             <span class="ability-key">${s.key}</span>
             ${iconMarkup}
             <span class="ability-name">${label}</span>
           </div>
-          <div class="ability-cost">${s.isPurchased ? (totalCost > 0 ? totalCost + ' ¤' : 'FREE') : 'NO PURCHASE'}</div>
+          <div class="ability-cost">${costLabel}</div>
         </div>
       `;
     }).join('');
@@ -703,7 +760,7 @@ function isFullBuy(result) {
   const shieldName = result.shield?.name?.trim().toLowerCase() || '';
   const abilities = result.abilityCombo?.slots || [];
   const hasAllUtilities = abilities.length > 0 && abilities.every(
-    ability => ability.maxPurchases > 0 && ability.quantity >= ability.maxPurchases
+    ability => ability.purchasedQuantity >= ability.maxPurchases
   );
 
   return FULL_BUY_WEAPONS.has(weaponName) && /heavy|lourd/.test(shieldName) && hasAllUtilities;

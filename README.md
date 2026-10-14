@@ -24,7 +24,7 @@ VALORANT ROULETTE is an Overwolf app designed to add an element of randomness to
 
 - Randomly selects a weapon, abilities, and a shield.
 - Maps abilities to the `C`, `Q`, and `E` keys based on the slots returned by the API.
-- Applies locally configured ability costs and charge limits.
+- Tracks free starting ability charges separately from additional purchasable charges.
 - Lets you enter your credit balance directly using a keyboard or numpad (from 0 to 9,000 credits).
 - Quickly adjusts credits in increments of 100 or 500.
 - Lets you allow or exclude individual weapons from the roulette and saves those preferences locally.
@@ -65,13 +65,16 @@ Example structure:
 
 ```json
 {
-  "Breach": {
-    "Ability1": { "key": "Q", "cost": 250, "maxCharges": 2 },
-    "Ability2": { "key": "E", "cost": 0, "maxCharges": 1 },
-    "Grenade": { "key": "C", "cost": 200, "maxCharges": 1 }
+  "Phoenix": {
+    "Ability2": { "key": "E", "cost": 250, "freeCharges": 1, "maxPurchases": 1 }
+  },
+  "Gekko": {
+    "Ability2": { "key": "E", "cost": 0, "freeCharges": 1, "maxPurchases": 0 }
   }
 }
 ```
+
+`freeCharges` is the number of charges available at the start of the round. `maxPurchases` is the number of additional charges that can be bought, and `cost` is charged for each purchased charge. Existing configurations using `maxCharges` remain supported; that legacy value is treated as the total charge limit, including free charges.
 
 The API slots `Ability1`, `Ability2`, and `Grenade` correspond to the abilities assigned to the `Q`, `E`, and `C` keys by default. The JSON `key` field lets you configure which key is displayed in the roulette.
 
