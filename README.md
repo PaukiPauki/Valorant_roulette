@@ -33,6 +33,12 @@ VALORANT ROULETTE is an Overwolf app designed to add an element of randomness to
 - Automatically synchronizes the agent selector and balance when match data is available.
 - Uses built-in fallback values if the API or local economy file is unavailable.
 
+## Screenshots
+
+![VALORANT Roulette with the agent selector open](assets/image.png)
+
+![VALORANT Roulette during a spin](assets/image-1.png)
+
 ## Controls
 
 | Key / control | Action |
