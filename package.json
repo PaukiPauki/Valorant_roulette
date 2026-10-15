@@ -1,0 +1,24 @@
+{
+  "name": "valorant_roulette",
+  "version": "1.0.0",
+  "description": "<div align=\"center\">",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PaukiPauki/Valorant_roulette.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PaukiPauki/Valorant_roulette/issues"
+  },
+  "homepage": "https://github.com/PaukiPauki/Valorant_roulette#readme",
+  "devDependencies": {
+    "electron": "^44.7.2"
+  }
+}

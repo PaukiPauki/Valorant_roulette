@@ -189,61 +189,7 @@ let AGENTS = { ...NORMALIZED_DEFAULT_AGENTS };
 let credits = 4000;
 let currentAgent = 'Raze';
 let isSpinning = false;
-let pendingLiveGameState = null;
-let agentNamesByGameId = {};
 const CARD_HEIGHT = 130; // Hauteur uniforme pour aligner le centre
-
-const VALORANT_AGENT_ALIASES = {
-  Clay: 'Raze',
-  Pandemic: 'Viper',
-  Wraith: 'Omen',
-  Hunter: 'Sova',
-  Thorne: 'Sage',
-  Phoenix: 'Phoenix',
-  Wushu: 'Jett',
-  Gumshoe: 'Cypher',
-  Sarge: 'Brimstone',
-  Breach: 'Breach',
-  Vampire: 'Reyna',
-  Killjoy: 'Killjoy',
-  Guide: 'Skye',
-  Stealth: 'Yoru',
-  Rift: 'Astra',
-  Grenadier: 'KAY/O',
-  Deadeye: 'Chamber',
-  Sprinter: 'Neon',
-  BountyHunter: 'Fade',
-  Mage: 'Harbor',
-  AggroBot: 'Gekko',
-  Cable: 'Deadlock',
-  Sequoia: 'Iso',
-  Smonk: 'Clove'
-};
-
-function applyValorantState(state) {
-  if (isSpinning) {
-    pendingLiveGameState = { ...state };
-    return;
-  }
-
-  if (state.agent) {
-    const agentId = state.agent.replace(/_PC_C$/, '');
-    const agentName = agentNamesByGameId[agentId]
-      || VALORANT_AGENT_ALIASES[agentId]
-      || (AGENTS[state.agent] ? state.agent : null);
-
-    if (agentName && AGENTS[agentName] && agentName !== currentAgent) {
-      currentAgent = agentName;
-      const select = document.getElementById('agent-select');
-      if (select) select.value = agentName;
-      initReel('ability', generateAbilityCombinations(AGENTS[currentAgent])[0]);
-    }
-  }
-
-  if (Number.isFinite(state.credits)) {
-    setCredits(state.credits);
-  }
-}
 
 // --- GÉNÉRATION COMBINATOIRE (charges gratuites + achats optionnels) ---
 function generateAbilityCombinations(abilities) {
@@ -487,33 +433,9 @@ async function loadShieldsFromApi() {
 async function loadAbilitiesEconomy() {
   try {
     const economyUrl = new URL('abilities_economy.json', window.location.href);
-    let contents;
-
-    if (window.overwolf?.io?.readFileContents) {
-      const filePath = decodeURIComponent(economyUrl.pathname)
-        .replace(/^\/([A-Za-z]:)/, '$1')
-        .replace(/\//g, '\\');
-
-      try {
-        contents = await new Promise((resolve, reject) => {
-          window.overwolf.io.readFileContents(
-            filePath,
-            window.overwolf.io.enums.eEncoding.UTF8,
-            result => result.status === 'success'
-              ? resolve(result.content)
-              : reject(new Error(result.error || 'Lecture du fichier impossible'))
-          );
-        });
-      } catch (error) {
-        console.warn('Lecture Overwolf du fichier économie impossible, tentative avec fetch.', error);
-      }
-    }
-
-    if (!contents) {
-      const response = await fetch(economyUrl);
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      contents = await response.text();
-    }
+    const response = await fetch(economyUrl);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const contents = await response.text();
 
     const parsedEconomy = JSON.parse(contents);
     if (!parsedEconomy || typeof parsedEconomy !== 'object' || Array.isArray(parsedEconomy)) {
@@ -535,12 +457,8 @@ async function loadAgentsFromApi() {
     const payload = await response.json();
     const apiAgents = Array.isArray(payload?.data) ? payload.data : [];
     const mappedAgents = {};
-    const mappedAgentNamesByGameId = {};
 
     for (const agent of apiAgents) {
-      if (agent.developerName) {
-        mappedAgentNamesByGameId[agent.developerName] = agent.displayName;
-      }
       const fallback = NORMALIZED_DEFAULT_AGENTS[agent.displayName]
         || NORMALIZED_DEFAULT_AGENTS[agent.displayName.replace(/\s+/g, '')];
       const keyBySlot = { Grenade: 'C', Ability1: 'Q', Ability2: 'E' };
@@ -574,7 +492,6 @@ async function loadAgentsFromApi() {
 
     if (Object.keys(mappedAgents).length > 0) {
       AGENTS = mappedAgents;
-      agentNamesByGameId = mappedAgentNamesByGameId;
     }
   } catch (error) {
     console.warn('Impossible de charger les agents depuis l’API, utilisation du fallback local.', error);
@@ -836,11 +753,6 @@ async function spin() {
   document.getElementById('roll-btn').disabled = false;
   document.getElementById('current-credits').disabled = false;
   document.getElementById('weapon-preferences-open').disabled = false;
-  if (pendingLiveGameState) {
-    const latestState = pendingLiveGameState;
-    pendingLiveGameState = null;
-    applyValorantState(latestState);
-  }
 }
 
 // Initialisation
@@ -880,6 +792,10 @@ window.addEventListener('load', async () => {
     if (event.target === preferencesOverlay) closePreferences();
   });
 
+  document.getElementById('close-app').addEventListener('click', () => {
+    window.electronAPI?.quit();
+  });
+
   if (select) {
     select.addEventListener('change', (e) => {
       currentAgent = e.target.value;
@@ -908,10 +824,6 @@ window.addEventListener('load', async () => {
   initReel('ability', initialCombo);
   initReel('shield', SHIELDS[0]);
 
-  const background = window.overwolf?.windows?.getMainWindow?.();
-  if (typeof background?.subscribeToValorantState === 'function') {
-    background.subscribeToValorantState(applyValorantState);
-  }
 });
 
 window.addEventListener('keydown', (e) => {

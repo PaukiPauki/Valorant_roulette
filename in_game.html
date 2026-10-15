@@ -34,6 +34,11 @@
       font-size: 13px;
       letter-spacing: 1.5px;
       text-transform: uppercase;
+      -webkit-app-region: drag;
+    }
+
+    button, input, select, textarea {
+      -webkit-app-region: no-drag;
     }
 
     .header-left {
@@ -64,6 +69,33 @@
       font-size: 16px;
       font-weight: bold;
       color: #00f5d4;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .window-close {
+      width: 28px;
+      height: 28px;
+      border: 1px solid #34414b;
+      border-radius: 2px;
+      background: transparent;
+      color: #a0a8ae;
+      font-size: 18px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .window-close:hover {
+      border-color: #ff4655;
+      background: #ff4655;
+      color: #fff;
     }
 
     .credits-input {
@@ -726,8 +758,11 @@
       <select id="agent-select"></select>
     </div>
     <div class="logo">VALORANT ROULETTE</div>
-    <div class="credits-display">
-      CREDITS : <input id="current-credits" class="credits-input" type="number" min="0" max="9000" step="1" value="4000" inputmode="numeric" aria-label="Nombre de crédits" />
+    <div class="header-right">
+      <div class="credits-display">
+        CREDITS : <input id="current-credits" class="credits-input" type="number" min="0" max="9000" step="1" value="4000" inputmode="numeric" aria-label="Nombre de crédits" />
+      </div>
+      <button class="window-close" id="close-app" type="button" title="Quitter" aria-label="Quitter l’application">×</button>
     </div>
   </header>
 
